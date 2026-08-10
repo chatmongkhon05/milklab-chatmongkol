@@ -1,7 +1,7 @@
-"""MilkLab Sales Logger (S2).
+"""EasyMart Sales Logger (S2).
 
 Usage:
-    python sales_logger.py --menu "นมหมีฮอกไกโด" --qty 2 --price 65
+    python sales_logger.py --menu "นมสดยูเอชที 1 ลิตร" --qty 2 --price 45
 
 Reads GOOGLE_SHEETS_CREDENTIALS and TELEGRAM_BOT_TOKEN (or LINE_CHANNEL_TOKEN) from env.
 Appends row [timestamp, menu, qty, price, total] to a Google Sheet,
@@ -44,7 +44,7 @@ def append_to_sheet(menu: str, qty: int, price: float) -> dict:
     gc = gspread.authorize(credentials)
 
     # เปิด spreadsheet — ใช้ชื่อ milklab-sales หรือ env var SHEET_NAME
-    sheet_name = os.getenv("SHEET_NAME", "milklab-sales")
+    sheet_name = os.getenv("SHEET_NAME", "easymart-sales")
     try:
         sh = gc.open(sheet_name)
     except gspread.SpreadsheetNotFound:
@@ -106,7 +106,7 @@ def send_notification(message: str) -> str:
 
 def main() -> int:
     load_dotenv()
-    parser = argparse.ArgumentParser(description="MilkLab Sales Logger")
+    parser = argparse.ArgumentParser(description="EasyMart Sales Logger")
     parser.add_argument("--menu", required=True, help="ชื่อเมนู")
     parser.add_argument("--qty", type=int, required=True, help="จำนวนขวด")
     parser.add_argument("--price", type=float, required=True, help="ราคาต่อขวด")

@@ -1,9 +1,9 @@
-"""MilkLab Caption Generator (S1).
+"""EasyMart Caption Generator (S1).
 
 Usage:
     python caption_generator.py
 
-Reads GOOGLE_API_KEY from env. Generates a Thai caption for a milk menu item.
+Reads GOOGLE_API_KEY from env. Generates a Thai caption for an EasyMart product.
 """
 
 import os
@@ -14,9 +14,9 @@ from google import genai
 
 
 PROMPT_TEMPLATE = """\
-คุณคือ social media manager ของร้าน MilkLab° ร้านนมสดกลางคืน
+คุณคือ social media manager ของร้าน EasyMart ร้านสะดวกซื้อออนไลน์
 
-จงเขียนแคปชั่นภาษาไทย 2 ถึง 3 ประโยคโปรโมตเมนู: {menu}
+จงเขียนแคปชั่นภาษาไทย 2 ถึง 3 ประโยคโปรโมตสินค้า: {menu}
 
 เงื่อนไข:
 - โทนสนุก ใช้คำง่าย ใส่ emoji ได้
