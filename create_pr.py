@@ -1,4 +1,4 @@
-"""Create a GitHub Pull Request using the GitHub REST API."""
+"""Create a GitHub Pull Request using the GitHub REST API for Session 4 (Pivot)."""
 import json
 import os
 import sys
@@ -18,23 +18,16 @@ owner = "chatmongkhon05"
 repo = "milklab-chatmongkol"
 url = f"https://api.github.com/repos/{owner}/{repo}/pulls"
 
+pivot_body = ""
+if os.path.exists("PIVOT.md"):
+    with open("PIVOT.md", "r", encoding="utf-8") as f:
+        pivot_body = f.read()
+
 data = json.dumps({
-    "title": "feat(S2): Sales Logger + Agent Harness",
-    "head": "feature/sales-logger",
+    "title": "Pivot to PetLab° (Pet Shop Domain)",
+    "head": "pivot",
     "base": "main",
-    "body": (
-        "## Session 2: Sales Logger + Agent Harness\n\n"
-        "### สิ่งที่พัฒนา:\n"
-        "- **sales_logger.py**: บันทึกยอดขายลง Google Sheets + ส่งแจ้งเตือน Telegram\n"
-        "- **agent_harness.py**: รับคำสั่งภาษาไทย ส่ง Gemini API ตีความ tool call และรัน tool จริง\n"
-        "- **.github/workflows/sales-logger.yml**: ตั้ง cron 20:00 ICT ทุกวัน\n"
-        "- **reset_sheet.py**: utility สำหรับล้าง/ตั้งหัวตาราง Sheets\n\n"
-        "### Self-check:\n"
-        "- [x] Sheets append ทำงาน (มี row ใหม่ทุกครั้งที่รัน)\n"
-        "- [x] Telegram Bot ส่ง notification ได้\n"
-        "- [x] GitHub Actions workflow run ผ่าน (manual trigger)\n"
-        "- [x] agent_harness.py ตีความ 3 ตัวอย่างคำสั่งที่ต่างกัน\n"
-    )
+    "body": pivot_body or "Pivot to PetLab° domain for Session 4",
 }).encode("utf-8")
 
 req = urllib.request.Request(
@@ -52,7 +45,7 @@ req = urllib.request.Request(
 try:
     with urllib.request.urlopen(req) as resp:
         result = json.loads(resp.read())
-        print(f"Pull Request สร้างสำเร็จ!")
+        print("Pull Request สร้างสำเร็จ!")
         print(f"URL: {result['html_url']}")
         print(f"หมายเลข: #{result['number']}")
 except urllib.error.HTTPError as e:
@@ -62,3 +55,4 @@ except urllib.error.HTTPError as e:
         for err in body["errors"]:
             print(f"  - {err}")
     sys.exit(1)
+
