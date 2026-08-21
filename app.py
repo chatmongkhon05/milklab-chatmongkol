@@ -176,15 +176,44 @@ def generate_answer(query: str, context_chunks: list[str], trace_id: str | None 
         "คำตอบ:"
     )
 
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
-    try:
-        response = client.models.generate_content(
-            model=model_name,
-            contents=prompt,
-        )
-        answer = response.text.strip() if response.text else "ไม่มีคำตอบจากระบบ"
-    except Exception as exc:
-        answer = f"เกิดข้อผิดพลาดในการเชื่อมต่อกับ Gemini: {exc}"
+    models_to_try = [
+        os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
+        "gemini-3.5-flash-lite",
+        "gemini-1.5-flash",
+    ]
+    models_to_try = list(dict.fromkeys(models_to_try))
+
+    answer = ""
+    used_model = models_to_try[0]
+    last_exc = None
+
+    for model_name in models_to_try:
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+            )
+            if response and response.text:
+                answer = response.text.strip()
+                used_model = model_name
+                break
+        except Exception as exc:
+            last_exc = exc
+            err_str = str(exc)
+            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
+                time.sleep(1)
+                continue
+            break
+
+    if not answer:
+        if last_exc:
+            err_str = str(last_exc)
+            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                answer = "ขณะนี้โควตาการใช้งาน Gemini API เต็มชั่วคราว (429 Rate Limit) กรุณารอ 30-60 วินาที แล้วลองถามใหม่อีกครั้งครับ"
+            else:
+                answer = f"เกิดข้อผิดพลาดในการเชื่อมต่อกับ Gemini: {last_exc}"
+        else:
+            answer = "ไม่มีคำตอบจากระบบ"
 
     duration_ms = (time.time() - start_time) * 1000
     if trace_id:
@@ -192,7 +221,7 @@ def generate_answer(query: str, context_chunks: list[str], trace_id: str | None 
             trace_id=trace_id,
             span_name="generate_answer",
             duration_ms=duration_ms,
-            inputs={"query": query, "model": model_name, "context_count": len(context_chunks)},
+            inputs={"query": query, "model": used_model, "context_count": len(context_chunks)},
             outputs={"answer": answer},
         )
 
