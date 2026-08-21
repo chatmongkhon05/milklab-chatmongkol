@@ -1,7 +1,7 @@
-"""PetLab° Agent Harness (S2).
+"""EasyMart Agent Harness (S2).
 
 Usage:
-    python agent_harness.py --cmd "บันทึกขายอาหารสุนัข 2 ถุง ถุงละ 450"
+    python agent_harness.py --cmd "บันทึกขายข้าวสาร 2 ถุง ถุงละ 215"
 
 รับคำสั่งภาษาไทย ส่งให้ Gemini พร้อม tool schema parse response เป็น tool call
 เรียก tool จริง print trace log
@@ -20,11 +20,11 @@ from google.genai import types
 TOOL_SCHEMA = [
     {
         "name": "log_sale",
-        "description": "บันทึกการขายสินค้าสัตว์เลี้ยงลง Google Sheets และส่ง notification",
+        "description": "บันทึกการขายสินค้าของชำลง Google Sheets และส่ง notification",
         "parameters": {
             "type": "object",
             "properties": {
-                "menu": {"type": "string", "description": "ชื่อสินค้าหรือเมนูสัตว์เลี้ยง"},
+                "menu": {"type": "string", "description": "ชื่อสินค้าของชำ"},
                 "qty": {"type": "integer", "description": "จำนวนที่ขาย"},
                 "price": {"type": "number", "description": "ราคาต่อหน่วย"},
             },
@@ -78,7 +78,7 @@ def parse_command(cmd: str, api_key: str | None = None) -> dict:
     ]
 
     system_prompt = (
-        "คุณเป็น AI assistant สำหรับร้าน PetLab° ร้านขายอุปกรณ์และอาหารสัตว์เลี้ยงออนไลน์ "
+        "คุณเป็น AI assistant สำหรับร้าน EasyMart ร้านขายของชำมินิมาร์ทชุมชนออนไลน์ "
         "รับคำสั่งภาษาไทยจากพนักงาน แล้วเรียก tool ที่เหมาะสม "
         "ถ้าคำสั่งไม่ชัดเจนให้เดาจากบริบทให้ดีที่สุด"
     )
@@ -135,7 +135,7 @@ def dispatch_tool(tool_call: dict) -> str:
         ts = row["timestamp"]
         # ส่ง notification ด้วย
         try:
-            send_notification(f"🐾 [PetLab°] บันทึก {menu} x{qty} = {total} บาท")
+            send_notification(f"🛒 [EasyMart] บันทึก {menu} x{qty} = {total} บาท")
         except Exception:
             pass  # notification ล้มเหลวไม่หยุดโปรแกรม
         return f"OK: row appended at {ts}"
@@ -157,7 +157,7 @@ def dispatch_tool(tool_call: dict) -> str:
         ]
         credentials = Credentials.from_service_account_info(creds_info, scopes=scopes)
         gc = gspread.authorize(credentials)
-        sheet_name = _os.getenv("SHEET_NAME", "petlab-sales")
+        sheet_name = _os.getenv("SHEET_NAME", "easymart-sales")
         try:
             ws = gc.open(sheet_name).sheet1
         except gspread.SpreadsheetNotFound:
@@ -209,4 +209,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-

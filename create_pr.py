@@ -24,10 +24,10 @@ if os.path.exists("PIVOT.md"):
         pivot_body = f.read()
 
 data = json.dumps({
-    "title": "Pivot to PetLab° (Pet Shop Domain)",
+    "title": "Pivot to EasyMart (Grocery Store Domain)",
     "head": "pivot",
     "base": "main",
-    "body": pivot_body or "Pivot to PetLab° domain for Session 4",
+    "body": pivot_body or "Pivot to EasyMart grocery store domain for Session 4",
 }).encode("utf-8")
 
 req = urllib.request.Request(
@@ -55,4 +55,3 @@ except urllib.error.HTTPError as e:
         for err in body["errors"]:
             print(f"  - {err}")
     sys.exit(1)
-

@@ -1,9 +1,9 @@
-"""PetLab° Caption Generator — 3 styles (Cute / Minimal / Gen-Z).
+"""EasyMart Caption Generator — 3 styles (Friendly / Minimal / Promotion).
 
 Usage:
     python caption.py
 or:
-    python caption.py --menu "อาหารสุนัขเกรดพรีเมียม (โฮลิสติก)"
+    python caption.py --menu "ข้าวสารหอมมะลิ 100% 5kg"
 """
 
 import argparse
@@ -14,17 +14,17 @@ from google import genai
 
 
 STYLES = {
-    "Cute": (
-        "คุณคือ social media manager ของร้าน PetLab° ร้านขายอุปกรณ์และอาหารสัตว์เลี้ยงออนไลน์ สไตล์น่ารัก อบอุ่น ใส่ emoji เยอะ "
+    "Friendly": (
+        "คุณคือ social media manager ของร้าน EasyMart ร้านขายของชำออนไลน์ สไตล์เป็นกันเอง อบอุ่น ใส่ emoji สดใส "
         "เขียนแคปชั่นภาษาไทย 2-3 ประโยคโปรโมตสินค้า: {menu} ปิดด้วย call-to-action ห้ามใช้ em dash"
     ),
     "Minimal": (
-        "คุณคือ copywriter ร้าน PetLab° สไตล์ minimalist เรียบหรู ประโยคสั้น ไม่ใช้ emoji "
+        "คุณคือ copywriter ร้าน EasyMart สไตล์ minimalist เรียบหรู ตรงประเด็น ไม่ใช้ emoji "
         "เขียนแคปชั่นภาษาไทย 2 ประโยคโปรโมตสินค้า: {menu} ปิดด้วย call-to-action ห้ามใช้ em dash"
     ),
-    "Gen-Z": (
-        "คุณคือ social media manager ร้าน PetLab° สไตล์ Gen-Z ทาสหมาทาสแมวสุดคูล สลับภาษาไทย-อังกฤษ "
-        "ใช้ slang วัยรุ่น เขียนแคปชั่น 2-3 ประโยคโปรโมตสินค้า: {menu} ปิดด้วย call-to-action ห้ามใช้ em dash"
+    "Promotion": (
+        "คุณคือทีมการตลาดร้าน EasyMart เน้นโปรโมชั่นสุดคุ้ม ราคาถูกใจพ่อบ้านแม่บ้าน สลับใช้คำฮิต "
+        "เขียนแคปชั่น 2-3 ประโยคโปรโมตสินค้า: {menu} ปิดด้วย call-to-action ห้ามใช้ em dash"
     ),
 }
 
@@ -46,11 +46,11 @@ def main() -> int:
         print("[ERROR] GOOGLE_API_KEY not set", file=sys.stderr)
         return 1
 
-    parser = argparse.ArgumentParser(description="PetLab° Caption Generator (3 styles)")
-    parser.add_argument("--menu", default="อาหารสุนัขเกรดพรีเมียม (โฮลิสติก)", help="ชื่อสินค้า (default: อาหารสุนัขเกรดพรีเมียม (โฮลิสติก))")
+    parser = argparse.ArgumentParser(description="EasyMart Caption Generator (3 styles)")
+    parser.add_argument("--menu", default="ข้าวสารหอมมะลิ 100% 5kg", help="ชื่อสินค้า (default: ข้าวสารหอมมะลิ 100% 5kg)")
     args = parser.parse_args()
 
-    print(f"\n🐾 PetLab° Caption Generator — สินค้า: {args.menu}\n")
+    print(f"\n🛒 EasyMart Caption Generator — สินค้า: {args.menu}\n")
     print("=" * 60)
 
     for style in STYLES:
@@ -66,4 +66,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-
