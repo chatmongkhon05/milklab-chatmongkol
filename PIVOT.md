@@ -26,3 +26,8 @@
 | ผงซักฟอกสูตรเข้มข้น 800g | 89 | ขจัดคราบหนัก กลิ่นหอมสดชื่น |
 | น้ำยาล้างจานสูตรมะนาว 500ml | 32 | ขจัดคราบมัน สะอาดหมดจด |
 | กระดาษทิชชู่เช็ดหน้า (แพ็ก 3 ห่อ) | 45 | เหนียวนุ่ม ซึมซับดี |
+
+## Status & Deliverables
+- [x] Pivot completed for EasyMart Grocery Store domain
+- [x] RAG Chatbot Streamlit UI redesigned with custom brand aesthetic
+- [x] Gemini model rate limits & model fallback strategy implemented
