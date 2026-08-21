@@ -12,7 +12,6 @@ import sys
 import time
 from dotenv import load_dotenv
 from google import genai
-from google.genai.errors import APIError
 
 
 COMBINED_PROMPT = """\
@@ -49,10 +48,11 @@ def generate_all_captions(menu: str, api_key: str) -> dict[str, str]:
     client = genai.Client(api_key=api_key)
     prompt = COMBINED_PROMPT.format(menu=menu)
     
+    # รายชื่อโมเดลเรียงลำดับจากหลักไปสำรอง
     models_to_try = [
         os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+        "gemini-3.5-flash-lite",
         "gemini-1.5-flash",
-        "gemini-1.5-flash-8b",
     ]
     models_to_try = list(dict.fromkeys(models_to_try))
 
@@ -65,16 +65,15 @@ def generate_all_captions(menu: str, api_key: str) -> dict[str, str]:
                 model=model,
                 contents=prompt,
             )
-            if resp.text:
+            if resp and resp.text:
                 response_text = resp.text
                 break
-        except APIError as e:
+        except Exception as e:
             last_err = e
-            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-                time.sleep(2)  # รอเล็กน้อยแล้วลองรุ่นสำรอง
-                continue
-            # ถ้าเป็น 404ModelNotAvailable ให้ลองรุ่นต่อไป
-            if "404" in str(e):
+            err_str = str(e)
+            # ถ้าเจอ 429 (Rate Limit) หรือ 404 (Model Not Found) ให้ข้ามไปลองรุ่นถัดไป
+            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
+                time.sleep(1)
                 continue
             raise
 
@@ -123,8 +122,9 @@ def main() -> int:
             print(f"\n✨ [{style}]")
             print(caption)
             print()
-    except APIError as exc:
-        if "429" in str(exc) or "RESOURCE_EXHAUSTED" in str(exc):
+    except Exception as exc:
+        err_str = str(exc)
+        if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
             print(f"\n[WARN] โควตา Google Gemini API รายวัน/รายนาทีชั่วคราวเต็ม (429 Rate Limit)")
             print("กรุณารอประมาณ 30-60 วินาที แล้วลองใหม่อีกครั้งครับ")
             return 1

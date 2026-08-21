@@ -12,7 +12,6 @@ import time
 
 from dotenv import load_dotenv
 from google import genai
-from google.genai.errors import APIError
 
 
 PROMPT_TEMPLATE = """\
@@ -36,8 +35,8 @@ def generate_caption(menu: str, api_key: str | None = None) -> str:
     
     models_to_try = [
         os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+        "gemini-3.5-flash-lite",
         "gemini-1.5-flash",
-        "gemini-1.5-flash-8b",
     ]
     models_to_try = list(dict.fromkeys(models_to_try))
 
@@ -48,14 +47,13 @@ def generate_caption(menu: str, api_key: str | None = None) -> str:
                 model=model,
                 contents=PROMPT_TEMPLATE.format(menu=menu),
             )
-            if response.text:
+            if response and response.text:
                 return response.text.strip()
-        except APIError as e:
+        except Exception as e:
             last_err = e
-            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-                time.sleep(2)
-                continue
-            if "404" in str(e):
+            err_str = str(e)
+            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
+                time.sleep(1)
                 continue
             raise
 
@@ -78,8 +76,9 @@ def main() -> int:
         print()
         print(caption)
         return 0
-    except APIError as exc:
-        if "429" in str(exc) or "RESOURCE_EXHAUSTED" in str(exc):
+    except Exception as exc:
+        err_str = str(exc)
+        if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
             print("\n[WARN] โควตา Google Gemini API รายวัน/รายนาทีชั่วคราวเต็ม (429 Rate Limit)")
             print("กรุณารอประมาณ 30-60 วินาที แล้วลองใหม่อีกครั้งครับ")
             return 1
