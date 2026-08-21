@@ -15,8 +15,12 @@ scopes = [
 ]
 credentials = Credentials.from_service_account_info(creds_info, scopes=scopes)
 gc = gspread.authorize(credentials)
-sheet_name = os.getenv("SHEET_NAME", "milklab-sales")
-ws = gc.open(sheet_name).sheet1
+sheet_name = os.getenv("SHEET_NAME", "petlab-sales")
+try:
+    ws = gc.open(sheet_name).sheet1
+except gspread.SpreadsheetNotFound:
+    print(f"Sheet '{sheet_name}' not found, skipping reset.")
+    exit(0)
 
 # Clear all values
 ws.clear()
@@ -25,10 +29,10 @@ ws.clear()
 headers = ["timestamp", "menu", "qty", "price", "total"]
 rows = [
     headers,
-    ["2026-07-21T20:04:58+07:00", "นมหมีฮอกไกโด", 1, 65, 65],
-    ["2026-07-21T20:06:38+07:00", "นมหมี", 2, 65, 130],
-    ["2026-07-21T20:07:15+07:00", "นมหมี", 2, 65, 130]
+    ["2026-08-21T10:00:00+07:00", "อาหารสุนัขเกรดพรีเมียม (โฮลิสติก) 1.5kg", 1, 450, 450],
+    ["2026-08-21T10:15:00+07:00", "ทรายแมวภูเขาไฟ 10 ลิตร", 2, 220, 440],
 ]
 
 ws.update("A1", rows)
 print("Sheet successfully reset with correct headers and clean data!")
+

@@ -1,4 +1,4 @@
-"""EasyMart RAG Chatbot (S3).
+"""PetLab° RAG Chatbot (S4 - Pivot).
 
 Run locally: streamlit run app.py
 Deploy: push to GitHub then Actions deploys to HuggingFace Space
@@ -51,7 +51,7 @@ def chunk_markdown(text: str) -> list[str]:
 
 @st.cache_resource
 def load_index():
-    """โหลด menu_kb.md, split เป็น chunk, encode ด้วย Google text-embedding-004,
+    """โหลด pet_kb.md, split เป็น chunk, encode ด้วย Google gemini-embedding-001,
     สร้าง faiss index. ใช้ Google API เพื่อรองรับภาษาไทยได้ดี
 
     Returns: (embed_fn, index, chunks_list)
@@ -61,7 +61,7 @@ def load_index():
     from dotenv import load_dotenv
     load_dotenv()
 
-    kb_path = "menu_kb.md"
+    kb_path = "pet_kb.md"
     if not os.path.exists(kb_path):
         raise FileNotFoundError(f"Knowledge base file '{kb_path}' not found.")
 
@@ -124,7 +124,7 @@ def retrieve_top_k(query: str, embed_fn, index, chunks: list[str], k: int = 3, t
     """encode query ด้วย Google Embedding API, search FAISS, return top-k chunks"""
     start_time = time.time()
 
-    # Encode query ด้วย embed_fn (Google text-embedding-004)
+    # Encode query ด้วย embed_fn (Google gemini-embedding-001)
     q_emb = embed_fn(query)
 
     # Search FAISS index
@@ -165,9 +165,9 @@ def generate_answer(query: str, context_chunks: list[str], trace_id: str | None 
     context_text = "\n".join(f"- {c}" for c in context_chunks)
 
     prompt = (
-        "คุณคือ AI Assistant ประจำร้าน EasyMart\n"
+        "คุณคือ AI Assistant ประจำร้าน PetLab° ร้านขายอุปกรณ์และอาหารสัตว์เลี้ยงออนไลน์\n"
         "ให้ตอบคำถามของลูกค้าโดยใช้ข้อมูลใน Context ต่อไปนี้เท่านั้น\n"
-        "ตอบอย่างสุภาพ กระชับ เป็นกันเอง และถูกต้องตามข้อมูลใน Context\n"
+        "ตอบอย่างสุภาพ อบอุ่น เป็นกันเอง ชัดเจน และถูกต้องตามข้อมูลใน Context\n"
         "หากใน Context ไม่มีข้อมูลที่ใช้ตอบคำถาม ให้ตอบว่าไม่ทราบข้อมูลหรือไม่พบข้อมูลในระบบ\n\n"
         f"Context:\n{context_text}\n\n"
         f"คำถาม: {query}\n"
@@ -198,9 +198,9 @@ def generate_answer(query: str, context_chunks: list[str], trace_id: str | None 
 
 
 def main():
-    st.set_page_config(page_title="EasyMart RAG Chatbot", page_icon="🛒")
-    st.title("EasyMart RAG Chatbot 🛒")
-    st.caption("ถามอะไรเกี่ยวกับ EasyMart ได้เลย ตอบจากข้อมูลร้านของเรา")
+    st.set_page_config(page_title="PetLab° RAG Chatbot", page_icon="🐾")
+    st.title("PetLab° RAG Chatbot 🐾")
+    st.caption("ถามข้อมูลสินค้าสัตว์เลี้ยง โภชนาการ พื้นที่จัดส่ง หรือโปรโมชั่นของ PetLab° ได้เลยครับ")
 
     try:
         embed_fn, index, chunks = load_index()
@@ -218,7 +218,7 @@ def main():
         with st.chat_message(msg["role"]):
             st.write(msg["content"])
 
-    if prompt := st.chat_input("ถามอะไรเกี่ยวกับ EasyMart"):
+    if prompt := st.chat_input("ถามเกี่ยวกับสินค้า หรือบริการของ PetLab°..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.write(prompt)
@@ -254,3 +254,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

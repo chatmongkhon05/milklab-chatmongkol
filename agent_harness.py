@@ -1,7 +1,7 @@
-"""MilkLab Agent Harness (S2).
+"""PetLab° Agent Harness (S2).
 
 Usage:
-    python agent_harness.py --cmd "บันทึกขายนมหมี 2 ขวด ขวดละ 65"
+    python agent_harness.py --cmd "บันทึกขายอาหารสุนัข 2 ถุง ถุงละ 450"
 
 รับคำสั่งภาษาไทย ส่งให้ Gemini พร้อม tool schema parse response เป็น tool call
 เรียก tool จริง print trace log
@@ -20,11 +20,11 @@ from google.genai import types
 TOOL_SCHEMA = [
     {
         "name": "log_sale",
-        "description": "บันทึกการขายลง Google Sheets และส่ง notification",
+        "description": "บันทึกการขายสินค้าสัตว์เลี้ยงลง Google Sheets และส่ง notification",
         "parameters": {
             "type": "object",
             "properties": {
-                "menu": {"type": "string", "description": "ชื่อเมนู"},
+                "menu": {"type": "string", "description": "ชื่อสินค้าหรือเมนูสัตว์เลี้ยง"},
                 "qty": {"type": "integer", "description": "จำนวนที่ขาย"},
                 "price": {"type": "number", "description": "ราคาต่อหน่วย"},
             },
@@ -57,7 +57,7 @@ TOOL_SCHEMA = [
 
 
 def parse_command(cmd: str, api_key: str | None = None) -> dict:
-    """TODO 1: ส่ง cmd ไป Gemini พร้อม TOOL_SCHEMA ขอให้ตอบเป็น JSON {tool, args}
+    """ส่ง cmd ไป Gemini พร้อม TOOL_SCHEMA ขอให้ตอบเป็น JSON {tool, args}
 
     Returns dict {"tool": <name>, "args": <dict>}
     Raises RuntimeError ถ้า parse ไม่ได้
@@ -78,7 +78,7 @@ def parse_command(cmd: str, api_key: str | None = None) -> dict:
     ]
 
     system_prompt = (
-        "คุณเป็น AI assistant สำหรับร้านนม MilkLab "
+        "คุณเป็น AI assistant สำหรับร้าน PetLab° ร้านขายอุปกรณ์และอาหารสัตว์เลี้ยงออนไลน์ "
         "รับคำสั่งภาษาไทยจากพนักงาน แล้วเรียก tool ที่เหมาะสม "
         "ถ้าคำสั่งไม่ชัดเจนให้เดาจากบริบทให้ดีที่สุด"
     )
@@ -117,7 +117,7 @@ def parse_command(cmd: str, api_key: str | None = None) -> dict:
 
 
 def dispatch_tool(tool_call: dict) -> str:
-    """TODO 2: เรียก tool ตาม tool_call["tool"] ด้วย args จริง
+    """เรียก tool ตาม tool_call["tool"] ด้วย args จริง
 
     Returns: ข้อความสรุปผลที่ tool คืน
     """
@@ -135,7 +135,7 @@ def dispatch_tool(tool_call: dict) -> str:
         ts = row["timestamp"]
         # ส่ง notification ด้วย
         try:
-            send_notification(f"บันทึก {menu} x{qty} = {total} บาท")
+            send_notification(f"🐾 [PetLab°] บันทึก {menu} x{qty} = {total} บาท")
         except Exception:
             pass  # notification ล้มเหลวไม่หยุดโปรแกรม
         return f"OK: row appended at {ts}"
@@ -157,7 +157,7 @@ def dispatch_tool(tool_call: dict) -> str:
         ]
         credentials = Credentials.from_service_account_info(creds_info, scopes=scopes)
         gc = gspread.authorize(credentials)
-        sheet_name = _os.getenv("SHEET_NAME", "milklab-sales")
+        sheet_name = _os.getenv("SHEET_NAME", "petlab-sales")
         try:
             ws = gc.open(sheet_name).sheet1
         except gspread.SpreadsheetNotFound:
@@ -187,7 +187,6 @@ def main() -> int:
 
     print(f"[USER] {args.cmd}")
 
-    # TODO 3: เรียก parse_command then dispatch_tool then print trace ตาม format ใน session-2.md
     try:
         tool_call = parse_command(args.cmd)
     except Exception as exc:
@@ -210,3 +209,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
