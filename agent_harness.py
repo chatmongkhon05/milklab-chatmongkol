@@ -83,7 +83,7 @@ def parse_command(cmd: str, api_key: str | None = None) -> dict:
         "ถ้าคำสั่งไม่ชัดเจนให้เดาจากบริบทให้ดีที่สุด"
     )
 
-    model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash-lite")
+    model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     response = client.models.generate_content(
         model=model_name,
         contents=cmd,
